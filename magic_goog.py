@@ -6,10 +6,11 @@ from transformers import pipeline
 import requests
 import numpy as np
 from selenium.webdriver.common.keys import Keys
-
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
 # nome del luogo di interesse
-name_of_place ='name_of_the_place'
+name_of_place ='pizzeria la favola brescia'
 
 
 start_time_total = time.time()
@@ -175,11 +176,13 @@ print('__________________________________\n')
 start_time = time.time()
 
 results = {}
+text_trad_list = []
 
 for k in range(len(df_analysis)):
     text_trad = df_analysis.Text.values[k] 
     r = requests.post(url='https://hf.space/embed/Sa-m/Auto-Translation/+/api/predict/', json={"data": [text_trad]})
     new_frase = r.json()['data'][0]
+    text_trad_list.append(new_frase)
     res = classifier(new_frase)[0]['label']
     if res == 'POSITIVE':
         res = 1
@@ -211,3 +214,42 @@ print('__________________________________\n')
 finish_time_total = time.time()
 delta_time_total = finish_time_total - start_time_total
 print(f'tempo totale: {round(delta_time_total/60,2)}')
+print('__________________________________\n')
+
+
+
+# wordcloud plot
+unique_string = (" ").join(text_trad_list)
+wordcloud = WordCloud(max_font_size=50, max_words=40, background_color="white").generate(unique_string)
+plt.figure(dpi=120)
+plt.imshow(wordcloud, interpolation='Bicubic')
+plt.axis("off")
+plt.show()
+
+
+# bar chart for 
+# function that count the frequency of all words in all reviews
+def word_count(str):
+    
+    # manual attempt to eliminate common words
+    list_word_exclude = ['the','and','a','that','is','in','at','have','has','i','the','for','but','was','we','with','of','it'
+                         ,'had','they','are','this','to','who','on','also','my','you','not','only']
+    counts = dict()
+    words = str.split()
+    for word in words:
+        word = word.lower()
+        if word in list_word_exclude:
+            pass
+        else:
+            if word in counts:
+                counts[word] += 1
+            else:
+                counts[word] = 1
+    return counts
+
+count_result = word_count(unique_string)
+df_count = pd.Series(count_result).to_frame().reset_index()
+df_count.rename(columns={"index": "Text", 0: "Count"},inplace=True)
+df_count.sort_values(['Count'],ascending=False,inplace=True)
+df_count_head = df_count.head(20)
+df_count_head.plot.bar(x = "Text", y = 'Count')
