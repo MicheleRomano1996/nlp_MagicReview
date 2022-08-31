@@ -17,7 +17,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # nome del luogo di interesse
-name_of_place ='pizzeria la favola brescia'
+name_of_place ='name of the place'
 
 
 start_time_total = time.time()
