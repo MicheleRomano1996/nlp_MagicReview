@@ -1,16 +1,23 @@
 # librerie utili
-import time
-from selenium import webdriver
+import numpy as np
 import pandas as pd
+import time
+import matplotlib.pyplot as plt
 from transformers import pipeline
 import requests
-import numpy as np
+from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from wordcloud import WordCloud
-import matplotlib.pyplot as plt
+import yake
+
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+
+import warnings
+warnings.filterwarnings("ignore")
 
 # nome del luogo di interesse
-name_of_place ='name of the place'
+name_of_place ='pizzeria la favola brescia'
 
 
 start_time_total = time.time()
@@ -46,14 +53,13 @@ elif '.' in total_number_of_reviews:
     total_number_of_reviews = int(total_number_of_reviews.replace('.',''))
 else:
     total_number_of_reviews = int(total_number_of_reviews)
-print(f'total number of review: {total_number_of_reviews}')
+print(f'\ntotal number of review: {total_number_of_reviews}')
 print()
 
 
 finish_time = time.time()
 delta_time = finish_time - start_time
 print(f'time: {round(delta_time,2)} s')
-
 print('__________________________________\n')
 
 
@@ -74,24 +80,18 @@ number = 0  # counter for the loop
 
 while True:   
     number = number+1
-
     # Scroll down to bottom -> Find scroll layout
     ele = driver.find_element_by_xpath('//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]')
     driver.execute_script('arguments[0].scrollBy(0, 5000);', ele)
-
     # Wait to load page
     time.sleep(1.5)
-
     # Calculate new scroll height and compare with last scroll height
     ele = driver.find_element_by_xpath('//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]')
     new_height = driver.execute_script("return arguments[0].scrollHeight", ele)
-
-
     if number == total_number:
         break
     if new_height == last_height:
         break
-        
     last_height = new_height
 
     
@@ -101,9 +101,8 @@ time.sleep(1)
 
 finish_time = time.time()
 delta_time = finish_time - start_time
-print(f'time: {round(delta_time,2)} s\n')
-
 print(f'Scraping finished!\n')
+print(f'time: {round(delta_time,2)} s\n')
 print('__________________________________\n')
 
 
@@ -164,7 +163,7 @@ for i in new_df.index:
         
 
 
-print(f'New df finished!\nLunghezza df: {len(df_analysis)}\n')
+print(f'New df finished!\nLunghezza df con solo Text: {len(df_analysis)}\n')
 finish_time = time.time()
 delta_time = finish_time - start_time
 print(f'time: {round(delta_time,2)} s')
@@ -213,7 +212,7 @@ print('__________________________________\n')
 
 finish_time_total = time.time()
 delta_time_total = finish_time_total - start_time_total
-print(f'tempo totale: {round(delta_time_total/60,2)}')
+print(f'tempo totale: {round(delta_time_total/60,2)} min')
 print('__________________________________\n')
 
 
@@ -253,3 +252,16 @@ df_count.rename(columns={"index": "Text", 0: "Count"},inplace=True)
 df_count.sort_values(['Count'],ascending=False,inplace=True)
 df_count_head = df_count.head(20)
 df_count_head.plot.bar(x = "Text", y = 'Count')
+plt.show()
+    
+print()
+print('__________________________________\n')
+# relevant keyword from all reviews by yake
+kwextractor = yake.KeywordExtractor()
+sentences = []
+post_keywords = kwextractor.extract_keywords(unique_string)
+for i in post_keywords:
+    sentences.append(i[0])
+print('Relevant keywords by yake:\n')
+for i in sentences:
+    print(i)
