@@ -4,4 +4,3 @@ Fun project aimed at translating written reviews from different sources (Google 
 # Description of main files
 - magic_goog: python script for Google Reviews
 - magic_trip: python notebook script for TripAdvisor (in progress...)
-- ...
