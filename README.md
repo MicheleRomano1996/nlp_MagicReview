@@ -1,5 +1,5 @@
 # nlp_MagicReview
-#### -> a sort of Sentiment analysis
+#### -> a sort of Sentiment Analysis
 
 Fun project aimed at translating written reviews from different sources (Google Reviews, Booking, TripAdvisor, ...) into something measurable. 
 
